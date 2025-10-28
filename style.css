@@ -1,0 +1,81 @@
+/* ======================================================================
+   Cursor Personalizado - StrongKids Monster
+   Implementación de cursor personalizado para toda la página web
+   ====================================================================== */
+
+/* Cursor personalizado principal para toda la página */
+body {
+    /* Cursor personalizado del monstruo con fallback */
+    cursor: url('assets/img/monstruo-cursor.png'), auto;
+    
+    /* Configuración adicional para mejor experiencia */
+    cursor: url('assets/img/monstruo-cursor.png') 16 16, auto; /* Punto de referencia del cursor */
+}
+
+/* Cursor para elementos interactivos */
+a, button, input[type="submit"], input[type="button"], 
+input[type="reset"], .clickable, [onclick] {
+    /* Cursor de mano para elementos interactivos */
+    cursor: pointer;
+}
+
+/* Cursor para elementos de texto */
+input[type="text"], input[type="email"], input[type="password"], 
+textarea, [contenteditable="true"] {
+    /* Cursor de texto para campos de entrada */
+    cursor: text;
+}
+
+/* Cursor para elementos redimensionables */
+textarea {
+    /* Cursor de redimensionamiento para textareas */
+    resize: vertical;
+}
+
+/* Cursor para elementos deshabilitados */
+button:disabled, input:disabled, .disabled {
+    /* Cursor de "no permitido" para elementos deshabilitados */
+    cursor: not-allowed;
+}
+
+/* Cursor para elementos de arrastre */
+.draggable {
+    /* Cursor de arrastre para elementos movibles */
+    cursor: move;
+}
+
+/* Cursor para enlaces externos */
+a[href^="http"] {
+    /* Cursor personalizado para enlaces externos */
+    cursor: url('assets/img/monstruo-cursor.png') 16 16, pointer;
+}
+
+/* Configuración adicional para mejor compatibilidad */
+* {
+    /* Asegurar que todos los elementos hereden el cursor del body */
+    cursor: inherit;
+}
+
+/* Media queries para diferentes tamaños de pantalla */
+@media (max-width: 768px) {
+    body {
+        /* En dispositivos móviles, usar cursor estándar */
+        cursor: auto;
+    }
+}
+
+/* Configuración para modo de alto contraste */
+@media (prefers-contrast: high) {
+    body {
+        /* Cursor estándar en modo de alto contraste */
+        cursor: auto;
+    }
+}
+
+/* Configuración para usuarios que prefieren movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    body {
+        /* Cursor estándar para usuarios que prefieren movimiento reducido */
+        cursor: auto;
+    }
+}

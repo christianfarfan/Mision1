@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Cursor PNG</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 2px solid #ddd;
+            margin: 20px 0;
+        }
+        button {
+            background: #3182CE;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #2C5AA0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Generador de Cursor PNG - StrongKids</h1>
+        <p>Este archivo genera una versión PNG del cursor personalizado del monstruo.</p>
+        
+        <canvas id="cursorCanvas" width="32" height="32"></canvas>
+        
+        <div>
+            <button onclick="generarCursor()">Generar Cursor PNG</button>
+            <button onclick="descargarCursor()">Descargar PNG</button>
+        </div>
+        
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        function generarCursor() {
+            const canvas = document.getElementById('cursorCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, 32, 32);
+            
+            // Crear un monstruo amigable y colorido
+            // Cuerpo del monstruo (verde)
+            ctx.fillStyle = '#38A169';
+            ctx.beginPath();
+            ctx.arc(16, 20, 12, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Ojos (blancos)
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(12, 16, 3, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(20, 16, 3, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Pupilas (negras)
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(12, 16, 1.5, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(20, 16, 1.5, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Boca sonriente (roja)
+            ctx.strokeStyle = '#E53E3E';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(16, 22, 6, 0, Math.PI);
+            ctx.stroke();
+            
+            // Cuernos pequeños (amarillos)
+            ctx.fillStyle = '#F6AD55';
+            ctx.beginPath();
+            ctx.moveTo(10, 8);
+            ctx.lineTo(8, 4);
+            ctx.lineTo(12, 6);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(22, 8);
+            ctx.lineTo(24, 4);
+            ctx.lineTo(20, 6);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Punto de referencia del cursor (esquina superior izquierda)
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, 2, 2);
+            
+            document.getElementById('resultado').innerHTML = '<p style="color: green;">✓ Cursor generado exitosamente!</p>';
+        }
+        
+        function descargarCursor() {
+            const canvas = document.getElementById('cursorCanvas');
+            const link = document.createElement('a');
+            link.download = 'monstruo-cursor.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            document.getElementById('resultado').innerHTML = '<p style="color: blue;">✓ Archivo PNG descargado!</p>';
+        }
+        
+        // Generar automáticamente al cargar
+        window.onload = function() {
+            generarCursor();
+        };
+    </script>
+</body>
+</html>
