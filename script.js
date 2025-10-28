@@ -296,30 +296,30 @@ document.addEventListener('DOMContentLoaded', function() {
     
     images.forEach(img => imageObserver.observe(img));
     
-    // Funcionalidad del chatbot placeholder
-    const chatbotPlaceholder = document.createElement('div');
-    chatbotPlaceholder.className = 'chatbot-placeholder';
-    chatbotPlaceholder.innerHTML = '<i class="fas fa-comments"></i>';
-    chatbotPlaceholder.setAttribute('aria-label', 'Abrir chat de soporte');
+    // Funcionalidad del chatbot placeholder - DESACTIVADO
+    // const chatbotPlaceholder = document.createElement('div');
+    // chatbotPlaceholder.className = 'chatbot-placeholder';
+    // chatbotPlaceholder.innerHTML = '<i class="fas fa-comments"></i>';
+    // chatbotPlaceholder.setAttribute('aria-label', 'Abrir chat de soporte');
     
-    chatbotPlaceholder.addEventListener('click', function() {
-        // Aquí se integraría la funcionalidad real del chatbot
-        alert('¡Hola! Soy el asistente virtual de StrongKids. Pronto estaré disponible para ayudarte con tus consultas.');
-    });
+    // chatbotPlaceholder.addEventListener('click', function() {
+    //     // Aquí se integraría la funcionalidad real del chatbot
+    //     alert('¡Hola! Soy el asistente virtual de StrongKids. Pronto estaré disponible para ayudarte con tus consultas.');
+    // });
     
-    document.body.appendChild(chatbotPlaceholder);
+    // document.body.appendChild(chatbotPlaceholder);
     
-    // Mostrar chatbot después de 3 segundos
-    setTimeout(() => {
-        chatbotPlaceholder.style.opacity = '0';
-        chatbotPlaceholder.style.transform = 'scale(0)';
-        chatbotPlaceholder.style.transition = 'all 0.3s ease';
+    // // Mostrar chatbot después de 3 segundos
+    // setTimeout(() => {
+    //     chatbotPlaceholder.style.opacity = '0';
+    //     chatbotPlaceholder.style.transform = 'scale(0)';
+    //     chatbotPlaceholder.style.transition = 'all 0.3s ease';
         
-        setTimeout(() => {
-            chatbotPlaceholder.style.opacity = '1';
-            chatbotPlaceholder.style.transform = 'scale(1)';
-        }, 100);
-    }, 3000);
+    //     setTimeout(() => {
+    //         chatbotPlaceholder.style.opacity = '1';
+    //         chatbotPlaceholder.style.transform = 'scale(1)';
+    //     }, 100);
+    // }, 3000);
     
     // Prevenir envío accidental del formulario con Enter
     inscripcionForm.addEventListener('keypress', function(e) {
