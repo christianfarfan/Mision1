@@ -6,12 +6,6 @@
     <title>StrongKids Play Gym - Fitness Funcional para Niños</title>
     <meta name="description" content="Gimnasio especializado en fitness funcional para niños. Desarrollo integral a través del ejercicio divertido y seguro.">
     
-    <!-- Metadatos adicionales para videos -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -53,7 +47,7 @@
                 <!-- Logo -->
                 <div class="flex items-center space-x-2">
                     <!-- Logo con imagen real -->
-                    <img src="assets/img/logo-strongkids.jpg" alt="StrongKids Play Gym Logo" class="w-12 h-12 rounded-lg object-cover shadow-md">
+                    <img src="./logo2.jpeg" alt="StrongKids Play Gym Logo" class="w-12 h-12 rounded-lg object-cover">
                     <span class="text-xl font-bold text-gray-800">StrongKids</span>
                 </div>
                 
@@ -88,13 +82,11 @@
     </header>
 
     <!-- Sección Hero -->
-    <section id="inicio" class="pt-20 bg-gradient-to-br from-strong-blue via-strong-green to-strong-yellow min-h-screen flex items-center relative cursor-monster">
+    <section id="inicio" class="pt-20 bg-gradient-to-br from-strong-blue via-strong-green to-strong-yellow min-h-screen flex items-center relative">
         <!-- Video de fondo -->
         <div class="absolute inset-0 overflow-hidden">
-            <video autoplay muted loop playsinline class="w-full h-full object-cover opacity-30" preload="metadata">
-                <source src="./video nino.mp4" type="video/mp4; codecs=avc1.42E01E,mp4a.40.2">
-                <source src="assets/videos/strongkids-gym-video.webm" type="video/webm; codecs=vp8,vorbis">
-                <source src="assets/videos/strongkids-gym-video.ogv" type="video/ogg; codecs=theora,vorbis">
+            <video autoplay muted loop class="w-full h-full object-cover opacity-30">
+                <source src="./Video niño.mp4" type="video/mp4">
                 Tu navegador no soporta videos HTML5.
             </video>
         </div>
@@ -117,6 +109,43 @@
         </div>
     </section>
 
+    <!-- Carrusel de Imágenes - debajo de Conoce Nuestro Gimnasio -->
+    <section id="galeria" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h3 class="text-2xl md:text-3xl font-bold text-gray-800">Galería</h3>
+                <p class="text-gray-600">Un vistazo a nuestras clases y espacios</p>
+            </div>
+
+            <div class="sk-carousel">
+                <button type="button" class="sk-carousel-btn sk-prev" aria-label="Anterior">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <div class="sk-carousel-track" role="region" aria-roledescription="carousel" aria-label="Galería StrongKids">
+                    <div class="sk-slide is-active">
+                        <img src="./logo.jpeg" alt="Niños entrenando en StrongKids" />
+                    </div>
+                    <div class="sk-slide">
+                        <img src="./logo2.jpeg" alt="Equipo y zona de juego funcional" />
+                    </div>
+                    <div class="sk-slide">
+                        <img src="./registro.jpeg" alt="Ambiente seguro y divertido" />
+                    </div>
+                    <div class="sk-slide">
+                        <img src="./registro-mercantil.jpeg" alt="Compromiso y confianza" />
+                    </div>
+                </div>
+
+                <button type="button" class="sk-carousel-btn sk-next" aria-label="Siguiente">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+
+                <div class="sk-dots" role="tablist" aria-label="Selector de diapositivas"></div>
+            </div>
+        </div>
+    </section>
+
     <!-- Sección de Video Promocional -->
     <section id="video" class="py-16 bg-white">
         <div class="container mx-auto px-4">
@@ -125,27 +154,39 @@
                     Conoce Nuestro Gimnasio
                 </h2>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    Mira cómo nuestros niños disfrutan del fitness funcional en un ambiente seguro y divertido
+                    Mira cómo nuestros niños disfrutan del fitness funcional en un ambiente seguro y divertido.
                 </p>
             </div>
-            
-            <div class="max-w-4xl mx-auto">
-                <div class="relative rounded-2xl overflow-hidden shadow-2xl">
-                    <video controls preload="metadata" class="w-full h-auto" poster="assets/img/video-poster.svg">
-                        <source src="./video nino.mp4" type="video/mp4; codecs=avc1.42E01E,mp4a.40.2">
-                        <source src="assets/videos/strongkids-gym-video.webm" type="video/webm; codecs=vp8,vorbis">
-                        <source src="assets/videos/strongkids-gym-video.ogv" type="video/ogg; codecs=theora,vorbis">
-                        Tu navegador no soporta videos HTML5.
-                    </video>
-                    <!-- Overlay con información -->
-                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
-                        <h3 class="text-white text-xl font-bold mb-2">StrongKids Play Gym</h3>
-                        <p class="text-white opacity-90">Fitness funcional para niños - Diversión y desarrollo integral</p>
-                    </div>
-                </div>
+            <div class="video-container mx-auto relative">
+            <!-- Contorno animado -->
+            <div class="video-border"></div>
+
+            <!-- Video -->
+            <video id="gymVideo" class="video-player" poster="" preload="metadata">
+                <source src="./Video niño.mp4" type="video/mp4" />
+                Tu navegador no soporta videos HTML5.
+            </video>
+
+            <!-- Botón Play/Pause -->
+            <button id="controlButton" class="control-btn">
+                <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" width="44px" height="44px">
+                <path d="M8 5v14l11-7z" />
+                </svg>
+                <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" width="44px" height="44px" class="hidden">
+                <path d="M6 19h4V5H6zm8-14v14h4V5h-4z" />
+                </svg>
+            </button>
+
+            <!-- Overlay -->
+            <div class="video-overlay">
+                <h3 class="text-white text-lg md:text-xl font-bold mb-1">StrongKids Play Gym</h3>
+                <p class="text-gray-200 text-sm md:text-base opacity-90">
+                Fitness funcional para niños — diversión, fuerza y desarrollo integral.
+                </p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- Sección de Valor y Diferenciación -->
     <section id="programas" class="py-16 bg-white">
@@ -198,6 +239,73 @@
         </div>
     </section>
 
+    <!--  Seccion de Precios -->
+
+    <section id="programas" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+          <div class="text-center mb-12">
+            <h2 class="title">Planes y membresías</h2>
+      
+            <div class="filter-buttons">
+              <button class="filter-btn active" onclick="filterServices('todos')">Todos</button>
+              <button class="filter-btn" onclick="filterServices('inscripcion')">Inscripción</button>
+              <button class="filter-btn" onclick="filterServices('clases')">Clases</button>
+              <button class="filter-btn" onclick="filterServices('membresia')">Membresía</button>
+            </div>
+          </div>
+      
+          <div class="pricing-grid">
+            <div class="service-card" data-category="inscripcion">
+              <img src="./registro.jpeg" alt="Inscripción" class="service-image" />
+              <h3>Inscripción</h3>
+              <p>Ven e inscríbete y obtén una clase gratis.</p>
+              <div class="price">$50.000*</div>
+              <h3>Beneficios para el Niño/a</h3>
+              <ul>
+                    <li>Tu hijo no solo juega, sino que desarrolla habilidades fundamentales de forma progresiva</li>
+                    <li>"Invertimos en conocer a tu hijo. Nuestra membresía nos permite crear un plan de desarrollo único, celebrando sus avances mes a mes."</li>
+                    <li>"Más que un gimnasio, es su comunidad. Aquí tu hijo encontrará amigos y un lugar donde se siente seguro y valorado."</li>
+                </ul>
+              <button class="btn">Inscribirse</button>
+            </div>
+      
+            <div class="service-card" data-category="clases">
+              <img src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=400&q=80" alt="Clases" class="service-image" />
+              <h3>Clases</h3>
+              <p>Sesiones de 60 minutos con enfoque lúdico-deportivo. Grupos según edad y nivel de desarrollo.</p>
+              <div class="price">$50.000* por niño</div>
+              <h3>Cada clase combina:</h3>
+                <ul>
+                    <li>Circuitos psicomotrices</li>
+                    <li>Juegos de equilibrio y coordinación</li>
+                    <li>Retos de trabajo en equipo</li>
+                    <li>Mindfulness y respiración</li>
+                    <li>Movimientos con el propio peso corporal (Fuerza y Resistencia)</li>
+                    <li>Actividades con música y ritmo</li>
+                    <li>Core y Estabilidad</li>
+                </ul>
+              <button class="btn">Ver más</button>
+            </div>
+      
+            <div class="service-card" data-category="membresia">
+              <img src="https://images.unsplash.com/photo-1554284126-aa88f22d8b74?auto=format&fit=crop&w=400&q=80" alt="Membresía" class="service-image" />
+              <h3>Paquete de 8 sesiones</h3>
+              <p>Ideal para asistencia semanal (2 veces por semana) durante un mes.</p>
+              <div class="price">$350.000*</div>
+              <h3>En conjunto (x2) </h3>
+                <ul>
+                    <li>Ten 2 clases a la semana durante un mes por $650.000 cada uno</li>
+                    <li>Incluye seguimiento individual y reporte de progreso.</li>
+                </ul>
+              <button class="btn">Obtener membresía</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+        
+    <!--Fin precios-->
+
     <!-- Sección de Inscripción -->
     <section id="inscripcion" class="py-16 bg-gray-100">
         <div class="container mx-auto px-4">
@@ -212,7 +320,7 @@
                 </div>
                 
                 <div class="bg-white rounded-2xl shadow-lg p-8">
-                    <form id="inscripcion-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="space-y-6">
+                    <form id="inscripcion-form" action="https://formspree.io/f/mvgvkbkl" method="POST" class="space-y-6">
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label for="nombre-padre" class="block text-sm font-semibold text-gray-700 mb-2">
@@ -350,20 +458,21 @@
         </div>
     </footer>
 
- 
+    <!-- Chatbot Flotante -->
+    <!-- 
+    ESPACIO RESERVADO PARA INTEGRACIÓN DEL CHATBOT
+    Aquí se debe integrar el widget del chatbot que debe ser un ícono flotante
+    pegado a la esquina inferior derecha de la pantalla.
     
-    <!-- Chatbot Container -->
-    
+    Ejemplo de integración:
+    <div id="chatbot-widget" class="fixed bottom-6 right-6 z-50">
+        <button class="w-14 h-14 bg-gradient-to-r from-strong-blue to-strong-green rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-110">
+            <i class="fas fa-comments text-white text-xl"></i>
+        </button>
+    </div>
+    -->
 
-    <!-- Sonidos del Chatbot -->
-    <script src="assets/sounds/chatbot-open.js"></script>
-    
     <!-- JavaScript -->
     <script src="script.js"></script>
-    
-    <!-- Chatbot Chatbase -->
-    <script>
-    (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="zxVGO4PYweGgfa4czMAVC";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
-    </script>
 </body>
 </html>

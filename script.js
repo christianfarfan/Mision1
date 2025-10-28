@@ -75,35 +75,52 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Funcionalidad del formulario de inscripción
     if (inscripcionForm) {
-        inscripcionForm.addEventListener('submit', function(e) {
+        inscripcionForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            // Mostrar estado de carga
+
             const submitButton = inscripcionForm.querySelector('button[type="submit"]');
             const originalText = submitButton.textContent;
             submitButton.textContent = 'Enviando...';
             submitButton.classList.add('loading');
             submitButton.disabled = true;
-            
-            // Simular envío (aquí se integraría con Formspree)
-            setTimeout(() => {
-                // Mostrar mensaje de éxito
-                showFormMessage('¡Inscripción enviada exitosamente! Te contactaremos pronto.', 'success');
-                
-                // Resetear formulario
-                inscripcionForm.reset();
-                
-                // Restaurar botón
+
+            // Validar campos antes de enviar
+            const inputs = inscripcionForm.querySelectorAll('input, select');
+            let allValid = true;
+            inputs.forEach(i => { if (!validateField(i)) allValid = false; });
+            if (!allValid) {
+                showFormMessage('Por favor corrige los campos marcados.', 'error');
                 submitButton.textContent = originalText;
                 submitButton.classList.remove('loading');
                 submitButton.disabled = false;
-                
-                // Scroll al mensaje
-                const message = document.querySelector('.form-message');
-                if (message) {
-                    message.scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
+            try {
+                const formData = new FormData(inscripcionForm);
+                const response = await fetch(inscripcionForm.action, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    showFormMessage('¡Inscripción enviada exitosamente! Te contactaremos pronto.', 'success');
+                    inscripcionForm.reset();
+                } else {
+                    const data = await response.json().catch(() => null);
+                    const msg = data && data.errors ? data.errors.map(e => e.message).join(', ') : 'Ocurrió un error. Intenta de nuevo.';
+                    showFormMessage(msg, 'error');
                 }
-            }, 2000);
+            } catch (err) {
+                showFormMessage('No se pudo conectar. Verifica tu internet e inténtalo nuevamente.', 'error');
+            } finally {
+                submitButton.textContent = originalText;
+                submitButton.classList.remove('loading');
+                submitButton.disabled = false;
+                const message = document.querySelector('.form-message');
+                if (message) message.scrollIntoView({ behavior: 'smooth' });
+            }
         });
         
         // Validación en tiempo real
@@ -274,276 +291,30 @@ document.addEventListener('DOMContentLoaded', function() {
     
     images.forEach(img => imageObserver.observe(img));
     
-    // Chatbot Chatbase con Sonidos
-    let chatbaseWidget = null;
-    let isChatbaseOpen = false;
+    // Funcionalidad del chatbot placeholder
+    const chatbotPlaceholder = document.createElement('div');
+    chatbotPlaceholder.className = 'chatbot-placeholder';
+    chatbotPlaceholder.innerHTML = '<i class="fas fa-comments"></i>';
+    chatbotPlaceholder.setAttribute('aria-label', 'Abrir chat de soporte');
     
-    // Sonidos del chatbot
-    const playSound = (type) => {
-        try {
-            if (window.StrongKidsSounds && window.StrongKidsSounds[type]) {
-                window.StrongKidsSounds[type]();
-            }
-        } catch (e) {
-            console.log('Sonido no disponible:', e);
-        }
-    };
+    chatbotPlaceholder.addEventListener('click', function() {
+        // Aquí se integraría la funcionalidad real del chatbot
+        alert('¡Hola! Soy el asistente virtual de StrongKids. Pronto estaré disponible para ayudarte con tus consultas.');
+    });
     
-    // Detectar cuando el chatbot de Chatbase se abre
-    const detectChatbaseOpen = () => {
-        const checkInterval = setInterval(() => {
-            // Buscar el widget de Chatbase
-            const chatbaseIframe = document.querySelector('iframe[src*="chatbase"]') || 
-                                 document.querySelector('[data-chatbase-widget]') ||
-                                 document.querySelector('#chatbase-widget') ||
-                                 document.querySelector('.chatbase-widget');
-            
-            if (chatbaseIframe && !chatbaseWidget) {
-                chatbaseWidget = chatbaseIframe;
-                console.log('Chatbot Chatbase detectado');
-                
-                // Observar cambios en el iframe
-                observeChatbaseChanges();
-                clearInterval(checkInterval);
-            }
-        }, 1000);
+    document.body.appendChild(chatbotPlaceholder);
+    
+    // Mostrar chatbot después de 3 segundos
+    setTimeout(() => {
+        chatbotPlaceholder.style.opacity = '0';
+        chatbotPlaceholder.style.transform = 'scale(0)';
+        chatbotPlaceholder.style.transition = 'all 0.3s ease';
         
-        // Timeout de seguridad
         setTimeout(() => {
-            clearInterval(checkInterval);
-        }, 15000);
-    };
-    
-    // Observar cambios en el chatbot de Chatbase
-    const observeChatbaseChanges = () => {
-        if (!chatbaseWidget) return;
-        
-        // Crear un observer para detectar cambios en el DOM
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'childList') {
-                    // Verificar si el chatbot se abrió
-                    const chatContainer = document.querySelector('[class*="chat"]') ||
-                                        document.querySelector('[class*="widget"]') ||
-                                        document.querySelector('[class*="popup"]');
-                    
-                    if (chatContainer && !isChatbaseOpen) {
-                        isChatbaseOpen = true;
-                        console.log('Chatbot Chatbase abierto');
-                        playSound('open');
-                    }
-                }
-            });
-        });
-        
-        // Observar cambios en el documento
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-        
-        // También observar el iframe si es posible
-        if (chatbaseWidget.contentDocument) {
-            observer.observe(chatbaseWidget.contentDocument.body, {
-                childList: true,
-                subtree: true
-            });
-        }
-    };
-    
-    // Detectar clics en el botón del chatbot
-    const detectChatbaseClicks = () => {
-        // Interceptar todos los clics
-        document.addEventListener('click', (e) => {
-            // Buscar si el clic fue en un elemento relacionado con Chatbase
-            const chatbaseButton = e.target.closest('[class*="chat"]') ||
-                                 e.target.closest('[class*="widget"]') ||
-                                 e.target.closest('[class*="button"]') ||
-                                 e.target.closest('button') ||
-                                 e.target.closest('[data-chatbase]') ||
-                                 e.target.closest('[id*="chat"]');
-            
-            if (chatbaseButton && !isChatbaseOpen) {
-                // Verificar si es el botón del chatbot
-                const buttonText = chatbaseButton.textContent?.toLowerCase() || '';
-                const buttonClass = chatbaseButton.className?.toLowerCase() || '';
-                const buttonId = chatbaseButton.id?.toLowerCase() || '';
-                
-                if (buttonText.includes('chat') || 
-                    buttonText.includes('help') || 
-                    buttonText.includes('support') ||
-                    buttonClass.includes('chat') ||
-                    buttonClass.includes('widget') ||
-                    buttonId.includes('chat')) {
-                    
-                    console.log('Botón del chatbot detectado, reproduciendo sonido...');
-                    playSound('open');
-                    
-                    // Marcar como abierto después de un delay
-                    setTimeout(() => {
-                        isChatbaseOpen = true;
-                    }, 1000);
-                }
-            }
-        });
-        
-        // También interceptar eventos de mouseover en botones
-        document.addEventListener('mouseover', (e) => {
-            const button = e.target.closest('button, [role="button"], [class*="button"]');
-            if (button) {
-                const buttonText = button.textContent?.toLowerCase() || '';
-                const buttonClass = button.className?.toLowerCase() || '';
-                
-                if ((buttonText.includes('chat') || buttonClass.includes('chat')) && !isChatbaseOpen) {
-                    // Reproducir sonido de notificación al pasar el mouse
-                    playSound('notification');
-                }
-            }
-        });
-    };
-    
-    // Detectar respuestas del chatbot
-    const detectChatbaseResponses = () => {
-        const responseObserver = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'childList') {
-                    // Buscar mensajes del bot
-                    const botMessages = document.querySelectorAll('[class*="message"]:not([class*="user"])') ||
-                                      document.querySelectorAll('[class*="bot"]') ||
-                                      document.querySelectorAll('[class*="assistant"]');
-                    
-                    if (botMessages.length > 0) {
-                        // Verificar si hay un mensaje nuevo
-                        const lastMessage = botMessages[botMessages.length - 1];
-                        if (lastMessage && !lastMessage.dataset.soundPlayed) {
-                            lastMessage.dataset.soundPlayed = 'true';
-                            playSound('response');
-                        }
-                    }
-                }
-            });
-        });
-        
-        responseObserver.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-    };
-    
-    // Método adicional para detectar el chatbot de Chatbase
-    const detectChatbaseWidget = () => {
-        // Buscar el widget de Chatbase de manera más específica
-        const chatbaseSelectors = [
-            'iframe[src*="chatbase"]',
-            '[data-chatbase-widget]',
-            '#chatbase-widget',
-            '.chatbase-widget',
-            '[class*="chatbase"]',
-            '[id*="chatbase"]'
-        ];
-        
-        for (const selector of chatbaseSelectors) {
-            const element = document.querySelector(selector);
-            if (element) {
-                console.log('Widget de Chatbase encontrado:', selector);
-                
-                // Agregar listener para clics en el widget
-                element.addEventListener('click', () => {
-                    if (!isChatbaseOpen) {
-                        console.log('Chatbot Chatbase abierto por clic');
-                        playSound('open');
-                        isChatbaseOpen = true;
-                    }
-                });
-                
-                // Observar cambios en el widget
-                const widgetObserver = new MutationObserver((mutations) => {
-                    mutations.forEach((mutation) => {
-                        if (mutation.type === 'attributes' && 
-                            (mutation.attributeName === 'style' || mutation.attributeName === 'class')) {
-                            
-                            const element = mutation.target;
-                            const style = element.style.display || '';
-                            const className = element.className || '';
-                            
-                            // Verificar si el widget se hizo visible
-                            if ((style.includes('block') || style.includes('flex') || 
-                                 className.includes('open') || className.includes('visible')) && 
-                                !isChatbaseOpen) {
-                                
-                                console.log('Chatbot Chatbase abierto por cambio de atributo');
-                                playSound('open');
-                                isChatbaseOpen = true;
-                            }
-                        }
-                    });
-                });
-                
-                widgetObserver.observe(element, {
-                    attributes: true,
-                    attributeFilter: ['style', 'class']
-                });
-                
-                break;
-            }
-        }
-    };
-    
-    // Inicializar detección del chatbot
-    const initializeChatbaseDetection = () => {
-        detectChatbaseOpen();
-        detectChatbaseClicks();
-        detectChatbaseResponses();
-        detectChatbaseWidget();
-        
-        // Verificar periódicamente si el chatbot se ha cargado
-        const periodicCheck = setInterval(() => {
-            detectChatbaseWidget();
-        }, 2000);
-        
-        // Limpiar el intervalo después de 30 segundos
-        setTimeout(() => {
-            clearInterval(periodicCheck);
-        }, 30000);
-    };
-    
-    // Inicializar cuando la página esté lista
-    if (document.readyState === 'complete') {
-        initializeChatbaseDetection();
-    } else {
-        window.addEventListener('load', initializeChatbaseDetection);
-    }
-    
-    // Interceptar la función de Chatbase para detectar cuando se inicializa
-    const originalChatbase = window.chatbase;
-    if (originalChatbase) {
-        window.chatbase = function(...args) {
-            const result = originalChatbase.apply(this, args);
-            
-            // Si se está inicializando el chatbot
-            if (args[0] === 'getState' || args[0] === 'init') {
-                console.log('Chatbase inicializado, configurando sonidos...');
-                
-                // Configurar sonidos después de la inicialización
-                setTimeout(() => {
-                    const chatbaseButton = document.querySelector('[data-chatbase-widget]') ||
-                                         document.querySelector('#chatbase-widget') ||
-                                         document.querySelector('.chatbase-widget');
-                    
-                    if (chatbaseButton) {
-                        chatbaseButton.addEventListener('click', () => {
-                            console.log('Botón de Chatbase clickeado');
-                            playSound('open');
-                        });
-                    }
-                }, 1000);
-            }
-            
-            return result;
-        };
-    }
-    
-    console.log('Sistema de sonidos para Chatbase inicializado');
+            chatbotPlaceholder.style.opacity = '1';
+            chatbotPlaceholder.style.transform = 'scale(1)';
+        }, 100);
+    }, 3000);
     
     // Prevenir envío accidental del formulario con Enter
     inscripcionForm.addEventListener('keypress', function(e) {
@@ -564,37 +335,129 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Configuración adicional para videos
-    const videos = document.querySelectorAll('video');
-    videos.forEach(video => {
-        // Configurar eventos de video
-        video.addEventListener('loadstart', function() {
-            console.log('Video cargando...');
+    // ===== Carrusel StrongKids =====
+    const track = document.querySelector('.sk-carousel-track');
+    const slides = track ? Array.from(track.querySelectorAll('.sk-slide')) : [];
+    const btnPrev = document.querySelector('.sk-prev');
+    const btnNext = document.querySelector('.sk-next');
+    const dotsWrap = document.querySelector('.sk-dots');
+
+    if (track && slides.length && dotsWrap) {
+        let current = 0;
+        let autoplayTimer = null;
+        const AUTOPLAY_MS = 4000;
+
+        // Crear indicadores (dots)
+        slides.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.type = 'button';
+            dot.setAttribute('role', 'tab');
+            dot.setAttribute('aria-label', `Ir a la diapositiva ${i + 1}`);
+            if (i === 0) dot.setAttribute('aria-selected', 'true');
+            dotsWrap.appendChild(dot);
         });
-        
-        video.addEventListener('canplay', function() {
-            console.log('Video listo para reproducir');
-        });
-        
-        video.addEventListener('error', function(e) {
-            console.error('Error al cargar video:', e);
-            // Fallback: mostrar imagen de respaldo
-            const fallbackImg = document.createElement('img');
-            fallbackImg.src = 'assets/img/video-fallback.svg';
-            fallbackImg.alt = 'Video no disponible';
-            fallbackImg.className = 'w-full h-auto object-cover';
-            this.parentNode.replaceChild(fallbackImg, this);
-        });
-        
-        // Configurar reproducción automática en móviles
-        if (video.hasAttribute('autoplay')) {
-            video.addEventListener('canplaythrough', function() {
-                this.play().catch(e => {
-                    console.log('Autoplay bloqueado:', e);
-                });
-            });
+
+        const dots = Array.from(dotsWrap.querySelectorAll('button'));
+
+        function goTo(index) {
+            current = (index + slides.length) % slides.length;
+            const offset = -current * 100;
+            track.style.transform = `translateX(${offset}%)`;
+            slides.forEach((s, i) => s.classList.toggle('is-active', i === current));
+            dots.forEach((d, i) => d.setAttribute('aria-selected', i === current ? 'true' : 'false'));
         }
-    });
-    
+
+        function next() { goTo(current + 1); }
+        function prev() { goTo(current - 1); }
+
+        function startAutoplay() {
+            stopAutoplay();
+            autoplayTimer = setInterval(next, AUTOPLAY_MS);
+        }
+        function stopAutoplay() {
+            if (autoplayTimer) clearInterval(autoplayTimer);
+            autoplayTimer = null;
+        }
+
+        // Eventos
+        if (btnNext) btnNext.addEventListener('click', () => { next(); startAutoplay(); });
+        if (btnPrev) btnPrev.addEventListener('click', () => { prev(); startAutoplay(); });
+        dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); startAutoplay(); }));
+
+        // Gestos (swipe / drag)
+        let startX = 0;
+        let deltaX = 0;
+        const onStart = (e) => { startX = e.touches ? e.touches[0].clientX : e.clientX; deltaX = 0; stopAutoplay(); };
+        const onMove = (e) => { const x = e.touches ? e.touches[0].clientX : e.clientX; deltaX = x - startX; };
+        const onEnd = () => { if (Math.abs(deltaX) > 50) { deltaX < 0 ? next() : prev(); } startAutoplay(); };
+
+        track.addEventListener('touchstart', onStart, { passive: true });
+        track.addEventListener('touchmove', onMove, { passive: true });
+        track.addEventListener('touchend', onEnd);
+        track.addEventListener('mousedown', onStart);
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onEnd);
+
+        // Pausar al pasar el mouse (desktop)
+        const carouselRoot = document.querySelector('.sk-carousel');
+        if (carouselRoot && matchMedia('(hover:hover)').matches) {
+            carouselRoot.addEventListener('mouseenter', stopAutoplay);
+            carouselRoot.addEventListener('mouseleave', startAutoplay);
+        }
+
+        // Inicializar
+        goTo(0);
+        startAutoplay();
+    }
+
     console.log('StrongKids Play Gym - Landing Page cargada exitosamente');
 });
+
+function filterServices(category) {
+    const buttons = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.service-card');
+
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    cards.forEach(card => {
+        card.classList.remove('hidden');
+        if (category !== 'todos' && card.dataset.category !== category) {
+            card.classList.add('hidden');
+        }
+    });
+}
+
+ const video = document.getElementById("gymVideo");
+  const controlButton = document.getElementById("controlButton");
+  const playIcon = document.getElementById("playIcon");
+  const pauseIcon = document.getElementById("pauseIcon");
+
+  // Al hacer clic en el botón
+  controlButton.addEventListener("click", () => {
+    if (video.paused) {
+      video.play();
+      playIcon.classList.add("hidden");
+      pauseIcon.classList.remove("hidden");
+      setTimeout(() => controlButton.classList.add("fade-out"), 700);
+    } else {
+      video.pause();
+      pauseIcon.classList.add("hidden");
+      playIcon.classList.remove("hidden");
+      controlButton.classList.remove("fade-out");
+    }
+  });
+
+  // Cuando se pausa el video
+  video.addEventListener("pause", () => {
+    pauseIcon.classList.add("hidden");
+    playIcon.classList.remove("hidden");
+    controlButton.classList.remove("fade-out");
+  });
+
+  // Cuando termina
+  video.addEventListener("ended", () => {
+    pauseIcon.classList.add("hidden");
+    playIcon.classList.remove("hidden");
+    controlButton.classList.remove("fade-out");
+  });
