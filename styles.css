@@ -658,3 +658,100 @@ body {
   .sk-prev { left: 8px; }
   .sk-next { right: 8px; }
 }
+
+/* ===== Carrito StrongKids ===== */
+.sk-cart {
+  border: 1px solid #e5e7eb; /* gray-200 */
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.sk-cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #3182CE, #38A169);
+  color: #fff;
+}
+
+.sk-cart-title { font-weight: 700; }
+
+.sk-cart-clear {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 6px 10px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.sk-cart-clear:hover { background: rgba(255,255,255,0.3); }
+
+.sk-cart-items { padding: 8px 12px; }
+
+.sk-cart-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 6px;
+  border-bottom: 1px solid #f3f4f6; /* gray-100 */
+}
+
+.sk-item-name { font-weight: 600; color: #111827; }
+.sk-item-qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e5e7eb;
+  padding: 4px 8px;
+  border-radius: 10px;
+}
+.sk-item-qty button { width: 22px; height: 22px; border-radius: 6px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; }
+.sk-item-remove { color: #ef4444; cursor: pointer; border: none; background: transparent; }
+
+.sk-cart-footer { padding: 12px 16px; background: #f9fafb; }
+.sk-cart-total-row { display: flex; justify-content: space-between; font-weight: 700; color: #111827; }
+
+/* ===== Badge Carrito en Header ===== */
+.sk-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ef4444; /* red-500 */
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 9999px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* ===== Modal Checkout ===== */
+.sk-modal { position: fixed; inset: 0; z-index: 50; }
+.sk-modal.hidden { display: none; }
+.sk-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); }
+.sk-modal-dialog {
+  position: relative; z-index: 51; max-width: 720px; margin: 5vh auto; background: #fff; border-radius: 16px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+.sk-modal-header { display:flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #f9fafb; }
+.sk-modal-header h3 { font-weight: 700; color: #111827; }
+.sk-modal-close { border: none; background: transparent; font-size: 22px; cursor: pointer; color: #6b7280; }
+.sk-modal-body { padding: 16px 20px; }
+.sk-modal-footer { padding: 16px 20px; display: flex; justify-content: flex-end; background: #f9fafb; }
+
+.sk-checkout-items { display: grid; gap: 10px; margin-bottom: 12px; }
+.sk-checkout-item { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items:center; border-bottom:1px solid #f3f4f6; padding-bottom:8px; }
+.sk-checkout-name { font-weight: 600; color: #111827; }
+.sk-checkout-qty { color: #374151; }
+.sk-checkout-price { font-weight: 700; color: #111827; }
+.sk-checkout-row { display: flex; justify-content: space-between; margin: 10px 0; }
+.sk-checkout-pay { margin-top: 10px; }
+.sk-pay-label { display:block; font-weight: 600; margin-bottom: 6px; color: #111827; }
+.sk-pay-options { display:flex; gap: 12px; color: #374151; }
+.sk-pay-btn { background: linear-gradient(135deg, #E53E3E, #DD6B20); color:#fff; border:none; padding: 10px 16px; border-radius: 10px; cursor: pointer; }

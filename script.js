@@ -97,6 +97,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             try {
+                // Adjuntar carrito al envío
+                const cartHiddenInput = document.getElementById('carrito-json');
+                if (cartHiddenInput && typeof cartState !== 'undefined') {
+                    cartHiddenInput.value = JSON.stringify(cartState.items || []);
+                }
                 const formData = new FormData(inscripcionForm);
                 const response = await fetch(inscripcionForm.action, {
                     method: 'POST',
@@ -409,6 +414,148 @@ document.addEventListener('DOMContentLoaded', function() {
         goTo(0);
         startAutoplay();
     }
+
+    // ===== Carrito StrongKids =====
+    const cartState = { items: [], prices: { basico: 50000, premium: 120000, ilimitado: 180000 } };
+    const planSelect = document.getElementById('plan-membresia');
+    const qtyInput = document.getElementById('cantidad-plan');
+    const addBtn = document.getElementById('btn-agregar-carrito');
+    const cartItemsEl = document.getElementById('sk-cart-items');
+    const cartTotalEl = document.getElementById('sk-cart-total');
+    const cartClearBtn = document.getElementById('sk-cart-clear');
+    const cartHiddenInputInit = document.getElementById('carrito-json');
+    const headerCartBtn = document.getElementById('header-cart-btn');
+    const headerCartCount = document.getElementById('header-cart-count');
+    const checkoutModal = document.getElementById('checkout-modal');
+    const checkoutClose = document.getElementById('checkout-close');
+    const checkoutItems = document.getElementById('checkout-items');
+    const checkoutSubtotal = document.getElementById('checkout-subtotal');
+    const checkoutPay = document.getElementById('checkout-pay');
+
+    function planDisplayName(value) {
+        switch (value) {
+            case 'basico': return 'Plan Básico - 2 clases/semana';
+            case 'premium': return 'Plan Premium - 4 clases/semana';
+            case 'ilimitado': return 'Plan Ilimitado - Acceso completo';
+            default: return 'Plan';
+        }
+    }
+
+    function renderCart() {
+        if (!cartItemsEl) return;
+        cartItemsEl.innerHTML = '';
+        let totalQty = 0;
+        cartState.items.forEach((item, idx) => {
+            totalQty += item.quantity;
+            const row = document.createElement('div');
+            row.className = 'sk-cart-item';
+            row.innerHTML = `
+                <div class="sk-item-name">${planDisplayName(item.plan)}</div>
+                <div class="sk-item-qty">
+                    <button type="button" aria-label="Disminuir" data-idx="${idx}" data-action="dec">-</button>
+                    <span>${item.quantity}</span>
+                    <button type="button" aria-label="Aumentar" data-idx="${idx}" data-action="inc">+</button>
+                </div>
+                <div></div>
+                <button type="button" class="sk-item-remove" aria-label="Eliminar" data-idx="${idx}" data-action="remove">Eliminar</button>
+            `;
+            cartItemsEl.appendChild(row);
+        });
+        if (cartTotalEl) cartTotalEl.textContent = String(totalQty);
+        if (headerCartCount) headerCartCount.textContent = String(totalQty);
+        if (cartHiddenInputInit) cartHiddenInputInit.value = JSON.stringify(cartState.items);
+    }
+
+    function addToCart(plan, quantity) {
+        if (!plan) return;
+        const qty = Math.max(1, parseInt(quantity || '1', 10));
+        const existing = cartState.items.find(i => i.plan === plan);
+        if (existing) existing.quantity += qty; else cartState.items.push({ plan, quantity: qty });
+        renderCart();
+        showFormMessage('Plan agregado al carrito.', 'success');
+    }
+
+    function updateItem(idx, action) {
+        const item = cartState.items[idx];
+        if (!item) return;
+        if (action === 'inc') item.quantity += 1;
+        if (action === 'dec') item.quantity = Math.max(1, item.quantity - 1);
+        if (action === 'remove') cartState.items.splice(idx, 1);
+        renderCart();
+    }
+
+    if (addBtn && planSelect && qtyInput) {
+        addBtn.addEventListener('click', () => {
+            const plan = planSelect.value;
+            const qty = qtyInput.value;
+            if (!plan) { showFormMessage('Selecciona un plan antes de agregar.', 'error'); return; }
+            addToCart(plan, qty);
+        });
+    }
+
+    if (cartItemsEl) {
+        cartItemsEl.addEventListener('click', (e) => {
+            const target = e.target;
+            if (!(target instanceof Element)) return;
+            const idx = target.getAttribute('data-idx');
+            const action = target.getAttribute('data-action');
+            if (idx !== null && action) updateItem(parseInt(idx, 10), action);
+        });
+    }
+
+    if (cartClearBtn) {
+        cartClearBtn.addEventListener('click', () => { cartState.items = []; renderCart(); });
+    }
+
+    // Checkout modal helpers
+    function formatCurrency(value) {
+        try {
+            return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value);
+        } catch (e) {
+            return `$${value}`;
+        }
+    }
+
+    function renderCheckout() {
+        if (!checkoutItems) return;
+        checkoutItems.innerHTML = '';
+        let subtotal = 0;
+        cartState.items.forEach((item) => {
+            const unit = cartState.prices[item.plan] || 0;
+            const line = unit * item.quantity;
+            subtotal += line;
+            const row = document.createElement('div');
+            row.className = 'sk-checkout-item';
+            row.innerHTML = `
+                <div class="sk-checkout-name">${planDisplayName(item.plan)}</div>
+                <div class="sk-checkout-qty">x ${item.quantity}</div>
+                <div class="sk-checkout-price">${formatCurrency(line)}</div>
+            `;
+            checkoutItems.appendChild(row);
+        });
+        if (checkoutSubtotal) checkoutSubtotal.textContent = formatCurrency(subtotal);
+    }
+
+    function openCheckout() {
+        if (!checkoutModal) return;
+        renderCheckout();
+        checkoutModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCheckout() {
+        if (!checkoutModal) return;
+        checkoutModal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    if (headerCartBtn) headerCartBtn.addEventListener('click', openCheckout);
+    if (checkoutClose) checkoutClose.addEventListener('click', closeCheckout);
+    if (checkoutModal) checkoutModal.addEventListener('click', (e) => { if (e.target === checkoutModal) closeCheckout(); });
+    if (checkoutPay) checkoutPay.addEventListener('click', () => { closeCheckout(); showFormMessage('Redirigiendo a pago... (demo)', 'success'); });
+
+    // Inicializar carrito
+    renderCart();
 
     console.log('StrongKids Play Gym - Landing Page cargada exitosamente');
 });

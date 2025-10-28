@@ -52,13 +52,18 @@
                 </div>
                 
                 <!-- Menú Desktop -->
-                <div class="hidden md:flex space-x-8">
+                <div class="hidden md:flex space-x-8 items-center">
                     <a href="#inicio" class="text-gray-700 hover:text-strong-red transition-colors">Inicio</a>
                     <a href="#video" class="text-gray-700 hover:text-strong-red transition-colors">Video</a>
                     <a href="#programas" class="text-gray-700 hover:text-strong-red transition-colors">Programas</a>
                     <a href="#precios" class="text-gray-700 hover:text-strong-red transition-colors">Precios</a>
                     <a href="#inscripcion" class="text-gray-700 hover:text-strong-red transition-colors">Inscripción</a>
                     <a href="#contacto" class="text-gray-700 hover:text-strong-red transition-colors">Contacto</a>
+                    <!-- Icono Carrito -->
+                    <button id="header-cart-btn" class="relative w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors" aria-label="Ver carrito">
+                        <i class="fas fa-shopping-cart text-gray-700"></i>
+                        <span id="header-cart-count" class="sk-badge" aria-label="Items en carrito">0</span>
+                    </button>
                 </div>
                 
                 <!-- Botón Hamburguesa -->
@@ -379,6 +384,24 @@
                                 </select>
                             </div>
                         </div>
+
+                        <!-- Carrito: cantidad y agregar -->
+                        <div class="grid md:grid-cols-3 gap-6 items-end">
+                            <div class="md:col-span-2">
+                                <label for="cantidad-plan" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Cantidad
+                                </label>
+                                <input type="number" id="cantidad-plan" min="1" value="1" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-strong-blue focus:border-transparent">
+                            </div>
+                            <div class="md:col-span-1">
+                                <button type="button" id="btn-agregar-carrito" class="w-full bg-gradient-to-r from-strong-blue to-strong-green text-white px-6 py-3 rounded-lg font-semibold hover:from-strong-green hover:to-strong-blue transition-all">
+                                    Agregar al carrito
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Campo oculto que enviará el carrito a Formspree -->
+                        <input type="hidden" id="carrito-json" name="carrito" value="[]">
                         
                         <div class="text-center">
                             <button type="submit" 
@@ -387,6 +410,21 @@
                             </button>
                         </div>
                     </form>
+
+                    <!-- Panel del Carrito -->
+                    <div id="sk-cart" class="sk-cart mt-8">
+                        <div class="sk-cart-header">
+                            <h4 class="sk-cart-title">Carrito</h4>
+                            <button type="button" id="sk-cart-clear" class="sk-cart-clear">Vaciar</button>
+                        </div>
+                        <div id="sk-cart-items" class="sk-cart-items"></div>
+                        <div class="sk-cart-footer">
+                            <div class="sk-cart-total-row">
+                                <span>Total de ítems</span>
+                                <strong id="sk-cart-total">0</strong>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -473,6 +511,36 @@
     -->
 
     <!-- JavaScript -->
+    
+    <!-- Modal Checkout -->
+    <div id="checkout-modal" class="sk-modal hidden">
+        <div class="sk-modal-backdrop"></div>
+        <div class="sk-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+            <div class="sk-modal-header">
+                <h3 id="checkout-title">Finalizar compra</h3>
+                <button type="button" id="checkout-close" aria-label="Cerrar" class="sk-modal-close">×</button>
+            </div>
+            <div class="sk-modal-body">
+                <div id="checkout-items" class="sk-checkout-items"></div>
+                <div class="sk-checkout-row">
+                    <span>Subtotal</span>
+                    <strong id="checkout-subtotal">$0</strong>
+                </div>
+                <div class="sk-checkout-pay">
+                    <label class="sk-pay-label">Medio de pago</label>
+                    <div class="sk-pay-options">
+                        <label><input type="radio" name="medio-pago" value="tarjeta" checked> Tarjeta</label>
+                        <label><input type="radio" name="medio-pago" value="transferencia"> Transferencia</label>
+                        <label><input type="radio" name="medio-pago" value="efectivo"> Efectivo</label>
+                    </div>
+                </div>
+            </div>
+            <div class="sk-modal-footer">
+                <button type="button" id="checkout-pay" class="sk-pay-btn">Pagar ahora</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
