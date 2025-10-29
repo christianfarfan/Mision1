@@ -608,3 +608,116 @@ function filterServices(category) {
     playIcon.classList.remove("hidden");
     controlButton.classList.remove("fade-out");
   });
+
+  (function(){
+    const root = document.querySelector('.sk-cards-carousel');
+    if(!root) return;
+  
+    const track = root.querySelector('.sk-track');
+    const cards = Array.from(track.querySelectorAll('.sk-card'));
+    const prevBtn = root.querySelector('.sk-prev');
+    const nextBtn = root.querySelector('.sk-next');
+    const dotsWrap = root.querySelector('.sk-dots');
+  
+    // build inner wrapper to slide
+    const inner = document.createElement('div');
+    inner.className = 'sk-track-inner';
+    // move cards into inner
+    cards.forEach(c => inner.appendChild(c));
+    track.appendChild(inner);
+  
+    let current = 0;
+    const total = cards.length;
+    let autoplay = true;
+    let timer = null;
+    const AUTOPLAY_MS = 4500;
+  
+    // create dots
+    function buildDots(){
+      dotsWrap.innerHTML = '';
+      for(let i=0;i<total;i++){
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label','Ir a la card '+(i+1));
+        b.setAttribute('aria-selected', i===0? 'true':'false');
+        b.addEventListener('click', ()=> { goTo(i); resetAutoplay(); });
+        dotsWrap.appendChild(b);
+      }
+    }
+  
+    function updateDots(){
+      const dots = Array.from(dotsWrap.children);
+      dots.forEach((d,i)=> d.setAttribute('aria-selected', i===current ? 'true' : 'false'));
+    }
+  
+    // calculate how many cards visible (based on flex-basis) to slide by view
+    function itemsPerView(){
+      // read width ratios: compute visible count by checking card width vs container
+      const card = inner.children[0];
+      if(!card) return 1;
+      const cardW = card.getBoundingClientRect().width;
+      const contW = track.getBoundingClientRect().width;
+      return Math.max(1, Math.round(contW / (cardW + 12))); // +gap approx
+    }
+  
+    function goTo(index){
+      // clamp circularly but slide by "page" equal to itemsPerView
+      const perView = itemsPerView();
+      // normalize index between 0..total-1
+      let idx = ((index % total) + total) % total;
+      current = idx;
+      // compute translateX based on card widths
+      const firstCard = inner.children[0];
+      const cardW = firstCard.getBoundingClientRect().width + 20; // consider gap
+      const offset = -(cardW * current);
+      inner.style.transform = `translateX(${offset}px)`;
+      updateDots();
+    }
+  
+    function next(){
+      const perView = itemsPerView();
+      goTo(current + perView);
+    }
+    function prev(){
+      const perView = itemsPerView();
+      goTo(current - perView);
+    }
+  
+    // autoplay
+    function startAuto(){ if(!autoplay) return; stopAuto(); timer = setInterval(()=> next(), AUTOPLAY_MS); }
+    function stopAuto(){ if(timer) { clearInterval(timer); timer = null; } }
+    function resetAutoplay(){ stopAuto(); startAuto(); }
+  
+    // gestures (simple)
+    let startX=0, delta=0, dragging=false;
+    inner.addEventListener('touchstart', e=> { startX = e.touches[0].clientX; dragging=true; stopAuto(); });
+    inner.addEventListener('touchmove', e=> { if(!dragging) return; delta = e.touches[0].clientX - startX; inner.style.transform = `translateX(${ - (inner.children[0].getBoundingClientRect().width + 20) * current + delta }px)`; });
+    inner.addEventListener('touchend', ()=> { dragging=false; if(Math.abs(delta) > 60) { delta < 0 ? next() : prev(); } else goTo(current); delta=0; startAuto(); });
+  
+    // keyboard
+    root.addEventListener('keydown', (e)=> {
+      if(e.key === 'ArrowRight'){ next(); resetAutoplay(); }
+      if(e.key === 'ArrowLeft'){ prev(); resetAutoplay(); }
+    });
+  
+    // pause on hover
+    root.addEventListener('mouseenter', ()=> stopAuto());
+    root.addEventListener('mouseleave', ()=> startAuto());
+  
+    // resize recalculation
+    let resizeTO;
+    window.addEventListener('resize', ()=> {
+      clearTimeout(resizeTO);
+      resizeTO = setTimeout(()=> { goTo(current); }, 120);
+    });
+  
+    // attach controls
+    prevBtn?.addEventListener('click', ()=> { prev(); resetAutoplay(); });
+    nextBtn?.addEventListener('click', ()=> { next(); resetAutoplay(); });
+  
+    // init
+    buildDots();
+    goTo(0);
+    startAuto();
+  
+  })();
